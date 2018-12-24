@@ -1,8 +1,6 @@
 # AsyncPaperclipUploader
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/async_paperclip_uploader`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Save your attachments first to filesystem and then save async to your model
 
 ## Installation
 
@@ -22,7 +20,44 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+First, call AsyncPaperclipUploader::Temporary.new passing the model object, the related attachment attribute, and the uploaded file. 
+e.g.:
+
+`AsyncPaperclipUploader::Temporary.new(@user, 'avatar', uploaded_file).call`
+
+Next, create the sidekiq job class, which should follow the following name convention: object class name + UploadJob, e.g.:
+
+`UserUploadJob`
+
+In this class, you must receive the attributes object_id, attribute and filepath. e.g.:
+
+`class UserUploadJob
+  include Sidekiq::Worker
+
+  def perform(user_id, attribute, filepath)
+  end
+
+end
+
+`
+
+Inside perform method, you will want to call AsyncPaperclipUploader::Permanent.new, which expects to receive the object class name, the object id, the attribute, and the filepath. e.g.:
+
+
+`
+def perform(user_id, attribute, filepath)
+  AsyncPaperclipUploader::Permanent.new('User', user_id, attribute, filepath).call
+end
+`
+
+If you want a callback to be ran, the call method accepts a block. e.g.:
+
+`
+AsyncPaperclipUploader::Permanent.new('User', user_id, attribute, filepath).call do
+  # you callback here
+end
+`
+
 
 ## Development
 
