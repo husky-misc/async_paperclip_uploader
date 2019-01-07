@@ -60,6 +60,7 @@ AsyncPaperclipUploader::Permanent.new('User', user_id, attribute, filepath).call
 end
 ```
 
+Besides all that, it is necessary for your project to have a environment variable named FILE_UPLOAD_STAGING_DIR which should contain a path for where you want the images to be saved temporarily before the proper upload on your model. 
 
 ## Development
 
