@@ -13,12 +13,11 @@ module AsyncPaperclipUploader
         if block_given?
           yield
         end
-        #clean
+        clean 
       end
     end
 
     private
-
     def file
       File.open(@filepath)
     end
